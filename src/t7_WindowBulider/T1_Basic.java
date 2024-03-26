@@ -12,11 +12,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 @SuppressWarnings("serial")
-public class Test1 extends JFrame {
+public class T1_Basic extends JFrame {
 	private JTextField textName, textKor, textEng, textMat;
 	private JButton btnInput, btnReset, btnExit; 
 
-	public Test1() {
+	public T1_Basic() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 600);
 		getContentPane().setLayout(null);
@@ -110,6 +110,6 @@ public class Test1 extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		Test1 frame = new Test1();
+		T1_Basic frame = new T1_Basic();
 	}
 }

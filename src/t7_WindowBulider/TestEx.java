@@ -16,11 +16,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
-public class Test3 extends JFrame {
+public class TestEx extends JFrame {
 	int day = 1, love = 0, dirty = 100;
 	JLabel lblLove, lblDirty, lblDate;
 	
-	public Test3() {
+	public TestEx() {
 		super("춘배 키우기");
 		getContentPane().setLayout(null);
 		setSize(710, 586);
@@ -176,6 +176,6 @@ public class Test3 extends JFrame {
 	
 	// 메인 메소드
 	public static void main(String[] args) {
-		new Test3();
+		new TestEx();
 	}
 }
