@@ -10,6 +10,8 @@ import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 
 @SuppressWarnings("serial")
@@ -82,7 +84,16 @@ public class InsaMain extends JFrame{
 		setVisible(true);
 		// ----------------------------------- 아래쪽은 메소드 ----------------------------------------
 		
-		// 회원 등록
+		// 회원 등록 버튼을 키보드 엔터키로 등록시 수행
+		btnInput.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				dispose();
+				new InsaInput();
+			}
+		});
+
+		// 회원 등록 버튼을 마우스로 클릭시 수행
 		btnInput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//System.exit(0); // 사용 X
@@ -92,8 +103,25 @@ public class InsaMain extends JFrame{
 		});
 		
 		// 개별 조회 버튼
+		// 마우스
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String name = JOptionPane.showInputDialog("검색할 성명을 입력하세용. ('-')/");
+				InsaDAO dao = new InsaDAO();
+				InsaVO vo = dao.getNameSearch(name);
+				
+				if(vo.getName() == null) JOptionPane.showMessageDialog(null, "찾으신 회원이 없습니다... \\(ㅇ-ㅇ)>","성명 오류",JOptionPane.ERROR_MESSAGE);
+				else {
+					dispose();
+					new InsaSearch(vo);
+				}
+			}
+		});
+		
+		// 키보드
+		btnSearch.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
 				String name = JOptionPane.showInputDialog("검색할 성명을 입력하세용. ('-')/");
 				InsaDAO dao = new InsaDAO();
 				InsaVO vo = dao.getNameSearch(name);
@@ -109,12 +137,22 @@ public class InsaMain extends JFrame{
 		// 전체 조회 버튼
 		btnList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				dispose();
+				new InsaList();
 			}
 		});
 		
 		// 종료 버튼
+		// 마우스
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		
+		// 키보드
+		btnExit.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
 				System.exit(0);
 			}
 		});

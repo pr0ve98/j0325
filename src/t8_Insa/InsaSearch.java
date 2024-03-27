@@ -6,12 +6,16 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import java.awt.Font;
+import java.awt.JobAttributes;
+
 import javax.swing.JTextField;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
@@ -120,29 +124,19 @@ public class InsaSearch extends JFrame {
 			dd[i] = (i+1) + "";
 		}
 		
-		// DB의 날짜 형식을 ComboBox의 날짜형식과 일치시켜서 비교하기 위한 작업
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-M-d"); // 2024-03-25 를 2024-3-25로 변경하기 위한 준비
-		LocalDate date = LocalDate.parse(vo.getIpsail().substring(0, 10),dtf);
-		String strDate = date.format(dtf);
-		
-		String[] ymds = strDate.split("-");
-		
 		cbYY = new JComboBox(yy);
 		cbYY.setBackground(new Color(255, 255, 255));
 		cbYY.setBounds(347, 280, 69, 23);
-		cbYY.setSelectedItem(ymds[0]);
 		pn2.add(cbYY);
 		
 		cbMM = new JComboBox(mm);
 		cbMM.setBackground(new Color(255, 255, 255));
 		cbMM.setBounds(467, 280, 69, 23);
-		cbMM.setSelectedItem(ymds[1]);
 		pn2.add(cbMM);
 		
 		cbDD = new JComboBox(dd);
 		cbDD.setBackground(new Color(255, 255, 255));
 		cbDD.setBounds(581, 280, 69, 23);
-		cbDD.setSelectedItem(ymds[2]);
 		pn2.add(cbDD);
 		
 		JLabel lblNewLabel = new JLabel("년");
@@ -165,17 +159,17 @@ public class InsaSearch extends JFrame {
 		getContentPane().add(pn3);
 		pn3.setLayout(null);
 		
-		JButton btnInput = new JButton("수정하기");
-		btnInput.setFont(new Font("경기천년제목 Light", Font.PLAIN, 14));
-		btnInput.setBackground(new Color(255, 255, 255));
-		btnInput.setBounds(109, 17, 115, 40);
-		pn3.add(btnInput);
+		JButton btnUpdate = new JButton("수정하기");
+		btnUpdate.setFont(new Font("경기천년제목 Light", Font.PLAIN, 14));
+		btnUpdate.setBackground(new Color(255, 255, 255));
+		btnUpdate.setBounds(109, 17, 115, 40);
+		pn3.add(btnUpdate);
 		
-		JButton btnReset = new JButton("삭제하기");
-		btnReset.setFont(new Font("경기천년제목 Light", Font.PLAIN, 14));
-		btnReset.setBackground(new Color(255, 255, 255));
-		btnReset.setBounds(333, 17, 115, 40);
-		pn3.add(btnReset);
+		JButton btnDelete = new JButton("삭제하기");
+		btnDelete.setFont(new Font("경기천년제목 Light", Font.PLAIN, 14));
+		btnDelete.setBackground(new Color(255, 255, 255));
+		btnDelete.setBounds(333, 17, 115, 40);
+		pn3.add(btnDelete);
 		
 		JButton btnClose = new JButton("창 닫기");
 		btnClose.setFont(new Font("경기천년제목 Light", Font.BOLD, 14));
@@ -187,8 +181,18 @@ public class InsaSearch extends JFrame {
 		// vo에 담겨서 넣어온 회원의 정보를 검색창에 뿌려주도록 한다.
 		txtName.setText(vo.getName());
 		txtAge.setText(vo.getAge()+"");
+		
 		if(vo.getGender().equals("남자")) rdGenderMale.setSelected(true);
 		else rdGenderFemale.setSelected(true);
+		
+		// DB의 날짜 형식을 ComboBox의 날짜형식과 일치시켜서 비교하기 위한 작업
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-M-d"); // 2024-03-25 를 2024-3-25로 변경하기 위한 준비
+		LocalDate date = LocalDate.parse(vo.getIpsail().substring(0, 10),dtf);
+		String strDate = date.format(dtf);
+		String[] ymds = strDate.split("-");
+		cbYY.setSelectedItem(ymds[0]);
+		cbMM.setSelectedItem(ymds[1]);
+		cbDD.setSelectedItem(ymds[2]);
 
 		
 		// ----------------------------------- 위쪽은 UI ----------------------------------------
@@ -199,8 +203,9 @@ public class InsaSearch extends JFrame {
 		setVisible(true);
 		// ----------------------------------- 아래쪽은 메소드 ----------------------------------------
 		
-		// 회원가입 버튼
-		btnInput.addActionListener(new ActionListener() {
+		// 수정하기 버튼
+		// 마우스
+		btnUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String name = txtName.getText().trim();
 				String age = txtAge.getText().trim();
@@ -208,11 +213,7 @@ public class InsaSearch extends JFrame {
 				String ipsail = cbYY.getSelectedItem()+"-"+cbMM.getSelectedItem()+"-"+cbDD.getSelectedItem();
 				
 				// 유효성 검사
-				if(name.equals("")) {
-					JOptionPane.showMessageDialog(null, "성명을 입력하세요.","성명 오류",JOptionPane.ERROR_MESSAGE);
-					txtName.requestFocus();
-				}
-				else if(!Pattern.matches("^[0-9]+$", age)) {
+				if(!Pattern.matches("^[0-9]+$", age)) {
 					JOptionPane.showMessageDialog(null, "나이는 숫자로만 입력하세요.","나이 오류",JOptionPane.ERROR_MESSAGE);
 					txtAge.requestFocus();
 				}
@@ -221,48 +222,91 @@ public class InsaSearch extends JFrame {
 					else gender = "여자";
 				}
 				
-//				// 모든 체크가 끝나면 DB에 새로운 회원을 가입처리한다.
-//				// 회원명 중복처리
-//				vo = dao.getNameSearch(name);
-//				if(vo.getName() != null) {
-//					JOptionPane.showMessageDialog(null, "이미 가입된 회원입니다. 다른 성명을 입력하세요.","성명 오류",JOptionPane.ERROR_MESSAGE);
-//					txtName.requestFocus();
-//				}
-//				else {
-//					// 정상적으로 자료가 입력되었다면 vo에 담아서 있는 값을 DB에 저장
-//					vo.setName(name);
-//					vo.setAge(Integer.parseInt(age));
-//					vo.setGender(gender);
-//					vo.setIpsail(ipsail);
-//					
-//					res = dao.setInsaInput(vo);
-//					
-//					if(res != 0) {
-//						JOptionPane.showMessageDialog(null, "가입되셨습니다! (^-^)/", "가입 성공",JOptionPane.INFORMATION_MESSAGE);
-//						dispose();
-//						new InsaMain();
-//					}
-//					else {
-//						JOptionPane.showMessageDialog(null, "회원가입 실패...","가입 실패",JOptionPane.ERROR_MESSAGE);
-//						txtName.requestFocus();
-//					}
+				//모든 체크가 끝나면 DB에 새로운 회원을 가입처리한다.
+				vo.setName(txtName.getText());
+				vo.setAge(Integer.parseInt(age));
+				vo.setGender(gender);
+				vo.setIpsail(ipsail);
 					
-//				}
+				res = dao.setInsaUpdate(vo);
+					
+				if(res != 0) {
+					JOptionPane.showMessageDialog(null, "정보가 수정되었습니다! (^-^)/", "수정 성공",JOptionPane.INFORMATION_MESSAGE);
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "정보 수정 실패...","수정 실패",JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		
-		// 다시 입력
-		btnReset.addActionListener(new ActionListener() {
+		//키보드
+		btnUpdate.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				String name = txtName.getText().trim();
+				String age = txtAge.getText().trim();
+				String gender = "";
+				String ipsail = cbYY.getSelectedItem()+"-"+cbMM.getSelectedItem()+"-"+cbDD.getSelectedItem();
+				
+				// 유효성 검사
+				if(!Pattern.matches("^[0-9]+$", age)) {
+					JOptionPane.showMessageDialog(null, "나이는 숫자로만 입력하세요.","나이 오류",JOptionPane.ERROR_MESSAGE);
+					txtAge.requestFocus();
+				}
+				else {
+					if(rdGenderMale.isSelected()) gender = "남자";
+					else gender = "여자";
+				}
+				
+				//모든 체크가 끝나면 DB에 새로운 회원을 수정처리한다.
+				vo.setName(txtName.getText());
+				vo.setAge(Integer.parseInt(age));
+				vo.setGender(gender);
+				vo.setIpsail(ipsail);
+					
+				res = dao.setInsaUpdate(vo);
+					
+				if(res != 0) {
+					JOptionPane.showMessageDialog(null, "정보가 수정되었습니다! (^-^)/", "수정 성공",JOptionPane.INFORMATION_MESSAGE);
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "정보 수정 실패...","수정 실패",JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
+		// 삭제버튼
+		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				txtName.setText("");
-				txtAge.setText("");
-				txtName.requestFocus();
+				String name = txtName.getText();
+				
+				int ans = JOptionPane.showConfirmDialog(null, name+" 회원을 삭제하시겠습니까?","회원 삭제창",JOptionPane.YES_NO_OPTION);
+				if(ans == 0) {
+					res = dao.setInsaDelete(name);
+					if(res != 0) {
+						JOptionPane.showMessageDialog(null, name+" 회원 자료가 삭제되었습니다");
+						dispose();
+						new InsaMain();
+					}
+					else JOptionPane.showMessageDialog(null, name+" 회원 자료 삭제 실패!");
+				}
+				else JOptionPane.showMessageDialog(null, name+" 회원 자료 삭제 취소!");
 			}
 		});
 		
 		// 창 닫기 버튼
+		// 마우스
 		btnClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				dispose();
+				new InsaMain();
+			}
+		});
+		
+		// 키보드
+		btnClose.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
 				dispose();
 				new InsaMain();
 			}
