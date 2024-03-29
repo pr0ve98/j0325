@@ -7,14 +7,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DBConn {
-	Connection conn = null;
-	PreparedStatement pstmt = null;
-	ResultSet rs = null;
+	public Connection conn = null;
+	public PreparedStatement pstmt = null;
+	public ResultSet rs = null;
 	
-	String sql = "";
+	public String sql = "";
 	
 	public DBConn() {
-		String url = "jdbc:mysql://localhost:3306/javaclass";
+		String url = "jdbc:mysql://localhost:3306/javaclass4";
 		String user = "root", password = "1234";
 		try {
 			Class.forName("com.mysql.jdbc.Driver");

@@ -1,4 +1,4 @@
-package t7_WindowBulider;
+package t7_WindowBuilder;
 
 import java.awt.Color;
 import java.awt.Font;
